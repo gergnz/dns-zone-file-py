@@ -1,0 +1,3 @@
+{% if origin %}$ORIGIN {{origin}}{% endif %}
+{% if ttl %}$TTL {{ttl}}{% endif %}
+{% for record in records %}{{record.name}} {{record.ttl}} {{record.class}} {{record.type}} {{record.data}}{% endfor %}
