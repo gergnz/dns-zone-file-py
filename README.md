@@ -88,5 +88,5 @@ www          IN     CNAME   server2
 ```
 $ORIGIN ryan.id
 $TTL 3600
-@ 1D IN URL mq9.s3.amazonaws.com/naval.id/profile.json
+@ 1D IN URI mq9.s3.amazonaws.com/naval.id/profile.json
 ```
