@@ -1,5 +1,11 @@
 # DNS Zone File Library
 
+[![CircleCI](https://img.shields.io/circleci/project/blockstack/dns-zone-file-py.svg)](https://circleci.com/gh/blockstack/dns-zone-file-py)
+[![PyPI](https://img.shields.io/pypi/v/zonefile.svg)](https://pypi.python.org/pypi/zonefile/)
+[![PyPI](https://img.shields.io/pypi/dm/zonefile.svg)](https://pypi.python.org/pypi/zonefile/)
+[![PyPI](https://img.shields.io/pypi/l/zonefile.svg)](https://pypi.python.org/pypi/zonefile/)
+[![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
+
 *A library for creating and parsing DNS zone files*
 
 #### Zone File Example
