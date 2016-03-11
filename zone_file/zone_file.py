@@ -1,5 +1,4 @@
 import json
-from jinja2 import Environment, PackageLoader
 
 def is_int(s):
     try:

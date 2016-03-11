@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='zone-file',
-    version='0.1.1',
+    version='0.1.2',
     url='https://github.com/blockstack/dns-zone-file-py',
     license='MIT',
     author='Blockstack Developers',
