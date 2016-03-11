@@ -94,9 +94,24 @@ def make_zone_file(origin, ttl, records):
     """
     zone_file = ""
 
-    env = Environment(loader=PackageLoader('zone_file', 'templates'))
-    template = env.get_template('zone_file.txt')
+    if origin:
+        zone_file += "$ORIGIN %s\n" % origin
+    if ttl:
+        zone_file += "$TTL %s\n" % ttl
+    
+    for record in records:
+        if not ("name" in record and "class" in record and "type" in record \
+                and "data" in record):
+            raise ValueError("Invalid record")
+        if "ttl" in record:
+            zone_file += "%s %s %s %s %s\n" % (
+                record["name"], record["ttl"], record["class"], record["type"],
+                record["data"])
+        else:
+            zone_file += "%s %s %s %s\n" % (
+                record["name"], record["class"], record["type"], record["data"])
 
-    zone_file = template.render(origin=origin, ttl=ttl, records=records)
+    if zone_file[-1] == '\n':
+        zone_file = zone_file[0:-1]
 
     return zone_file

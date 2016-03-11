@@ -20,7 +20,7 @@ class ZoneFileTests(unittest.TestCase):
             }
         ]
         zone_file = make_zone_file("ryan.id", "3600", records)
-        #print zone_file
+        print zone_file
         self.assertTrue(isinstance(zone_file, (unicode, str)))
 
     def test_zone_file_parsing(self):
