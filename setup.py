@@ -13,7 +13,7 @@ setup(
     license='MIT',
     author='Blockstack Developers',
     author_email='hello@onename.com',
-    description=("Library for creating and parsing DNS Zone Files"),
+    description=("Library for creating and parsing DNS zone files"),
     keywords='dns zone file zonefile parse create',
     packages=find_packages(),
     zip_safe=False,

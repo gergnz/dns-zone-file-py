@@ -1,4 +1,6 @@
-# DNS Zone File Converter
+# DNS Zone File Library
+
+*A library for creating and parsing DNS zone files*
 
 #### Zone File Example
 
