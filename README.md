@@ -82,8 +82,11 @@ www          IN     CNAME   server2
 
 ```python
 >>> records = [{ "name": "@", "ttl": "1D", "class": "IN", "type": "URI", "data": "mq9.s3.amazonaws.com/naval.id/profile.json"}]
->>> print make_zone_file("ryan.id", "3600", records)
+>>> zone_file = make_zone_file("ryan.id", "3600", records)
+```
+
+```
 $ORIGIN ryan.id
 $TTL 3600
-@ 1D IN URL mq9.s3.amazonaws.com/naval.id/profile.json
+@ 1D IN URI mq9.s3.amazonaws.com/naval.id/profile.json
 ```
