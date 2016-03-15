@@ -486,13 +486,15 @@ def remove_class( text ):
     ret = []
     for line in lines:
         tokens = tokenize( line )
-        if "IN" in tokens:
+        tokens_upper = [t.upper() for t in tokens]
+
+        if "IN" in tokens_upper:
             tokens.remove("IN")
-        elif "CS" in tokens:
+        elif "CS" in tokens_upper:
             tokens.remove("CS")
-        elif "CH" in tokens:
+        elif "CH" in tokens_upper:
             tokens.remove("CH")
-        elif "HS" in tokens:
+        elif "HS" in tokens_upper:
             tokens.remove("HS")
 
         ret.append( serialize(tokens) )
@@ -610,8 +612,7 @@ def parse_lines( text ):
     parser = make_parser()
 
     for rrtxt in rrs:
-        RR = rrtxt.upper()
-        RRtok = tokenize( RR )
+        RRtok = tokenize( rrtxt )
         ret = parse_line( parser, RRtok, ret )
 
     return ret
