@@ -29,72 +29,56 @@ www          IN     CNAME   server2
 
 ```python
 >>> zone_file_object = parse_zone_file(zone_file)
->>> print json.dumps(zone_file_object, indent=2)
+>>> print json.dumps(zone_file_object, indent=4, sort_keys=True)
 {
-  "origin": " example.com", 
-  "records": [
-    {
-      "data": "10.0.1.5", 
-      "type": "A", 
-      "name": "server1", 
-      "class": "IN"
-    }, 
-    {
-      "data": "10.0.1.7", 
-      "type": "A", 
-      "name": "server2", 
-      "class": "IN"
-    }, 
-    {
-      "data": "10.0.1.2", 
-      "type": "A", 
-      "name": "dns1", 
-      "class": "IN"
-    }, 
-    {
-      "data": "10.0.1.3", 
-      "type": "A", 
-      "name": "dns2", 
-      "class": "IN"
-    }, 
-    {
-      "data": "server1", 
-      "type": "CNAME", 
-      "name": "ftp", 
-      "class": "IN"
-    }, 
-    {
-      "data": "server1", 
-      "type": "CNAME", 
-      "name": "mail", 
-      "class": "IN"
-    }, 
-    {
-      "data": "server2", 
-      "type": "CNAME", 
-      "name": "mail2", 
-      "class": "IN"
-    }, 
-    {
-      "data": "server2", 
-      "type": "CNAME", 
-      "name": "www", 
-      "class": "IN"
-    }
-  ], 
-  "ttl": " 86400"
+    "$ORIGIN": "EXAMPLE.COM", 
+    "$TTL": 86400, 
+    "A": [
+        {
+            "ip": "10.0.1.5", 
+            "name": "SERVER1"
+        }, 
+        {
+            "ip": "10.0.1.7", 
+            "name": "SERVER2"
+        }, 
+        {
+            "ip": "10.0.1.2", 
+            "name": "DNS1"
+        }, 
+        {
+            "ip": "10.0.1.3", 
+            "name": "DNS2"
+        }
+    ], 
+    "CNAME": [
+        {
+            "alias": "SERVER1", 
+            "name": "FTP"
+        }, 
+        {
+            "alias": "SERVER1", 
+            "name": "MAIL"
+        }, 
+        {
+            "alias": "SERVER2", 
+            "name": "MAIL2"
+        }, 
+        {
+            "alias": "SERVER2", 
+            "name": "WWW"
+        }
+    ]
 }
 ```
 
 #### Making Zone Files
 
 ```python
->>> records = [{ "name": "@", "ttl": "1D", "class": "IN", "type": "URI", "data": "mq9.s3.amazonaws.com/naval.id/profile.json"}]
->>> zone_file = make_zone_file("ryan.id", "3600", records)
-```
-
-```
+>>> records = {'URI': [{'priority': 1, 'target': 'https://mq9.s3.amazonaws.com/naval.id/profile.json', 'name': '@', 'weight': 10, 'ttl': '1D'}]}
+>>> zone_file = make_zone_file(records, origin="ryan.id", ttl="3600")
+>>> print zone_file
 $ORIGIN ryan.id
 $TTL 3600
-@ 1D IN URI mq9.s3.amazonaws.com/naval.id/profile.json
+@ 1D URI 1 10 "https://mq9.s3.amazonaws.com/naval.id/profile.json"
 ```

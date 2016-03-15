@@ -1,0 +1,34 @@
+{
+    "$ORIGIN": "MYDOMAIN.COM.",
+    "$TTL": 3600,
+    "SOA": {
+        "mname": "NS1.NAMESERVER.NET.",
+        "rname": "HOSTMASTER.MYDOMAIN.COM.",
+        "serial": "{time}",
+        "refresh": 3600,
+        "retry": 600,
+        "expire": 604800,
+        "minimum": 86400
+    },
+    "NS": [
+        { "host": "NS1.NAMESERVER.NET." },
+        { "host": "NS2.NAMESERVER.NET." }
+    ],
+    "A": [
+        { "name": "@", "ip": "127.0.0.1" },
+        { "name": "www", "ip": "127.0.0.1" },
+        { "name": "mail", "ip": "127.0.0.1" }
+    ],
+    "AAAA": [
+        { "ip": "::1" },
+        { "name": "mail", "ip": "2001:db8::1" }
+    ],
+    "CNAME":[
+        { "name": "mail1", "alias": "mail" },
+        { "name": "mail2", "alias": "mail" }
+    ],
+    "MX":[
+        { "preference": 0, "host": "mail1" },
+        { "preference": 10, "host": "mail2" }
+    ]
+}

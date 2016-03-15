@@ -13,13 +13,18 @@ class ZoneFileTests(unittest.TestCase):
         pass
 
     def test_zone_file_creation(self):
-        records = [
-            {
-                "name": "@", "ttl": "1D", "class": "IN", "type": "URI",
-                "data": "mq9.s3.amazonaws.com/naval.id/profile.json"
-            }
-        ]
-        zone_file = make_zone_file("ryan.id", "3600", records)
+        records = {
+           "URI": [
+              {
+                "name": "@",
+                "ttl": "1D",
+                "priority": 1,
+                "weight": 10,
+                "target": "https://mq9.s3.amazonaws.com/naval.id/profile.json"
+              }
+           ]
+        }
+        zone_file = make_zone_file( records, origin="ryan.id", ttl="3600" )
         print zone_file
         self.assertTrue(isinstance(zone_file, (unicode, str)))
 
