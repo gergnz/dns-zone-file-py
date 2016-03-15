@@ -102,12 +102,16 @@ def processSOA( data, template ):
     """
     ret = template[:]
 
+    assert len(data) == 1, "Only support one SOA RR at this time"
+    data = data[0]
+
     if data is not None:
         soadat = []
-        fields = ['mname', 'rname', 'serial', 'refresh', 'retry', 'expire', 'minimum']
+        domain_fields = ['mname', 'rname']
+        param_fields = ['serial', 'refresh', 'retry', 'expire', 'minimum']
 
-        for f in fields:
-            assert f in data, "Missing '%s'" % f
+        for f in domain_fields + param_fields:
+            assert f in data.keys(), "Missing '%s' (%s)" % (f, data)
 
         data_name = str(data.get('name', '@'))
         soadat.append(data_name)
@@ -117,9 +121,14 @@ def processSOA( data, template ):
   
         soadat.append("IN")
         soadat.append("SOA")
+
+        for key in domain_fields:
+            value = str(data[key])
+            soadat.append( value )
+
         soadat.append("(")
 
-        for key in fields:
+        for key in param_fields:
             value = str(data[key])
             soadat.append( value )
 
