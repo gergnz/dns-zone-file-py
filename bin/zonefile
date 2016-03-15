@@ -1,0 +1,41 @@
+#!/usr/bin/python
+
+import zone_file
+import sys
+import os
+import json
+import traceback
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print >> sys.stderr, "Usage: %s [txt or json file] [origin] [ttl]" % sys.argv[0]
+        sys.exit(1)
+
+    origin = None
+    ttl = None
+
+    if len(sys.argv) >= 3:
+        origin = sys.argv[2]
+
+    if len(sys.argv) >= 4:
+        ttl = sys.argv[3]
+
+    dat = None
+    with open(sys.argv[1], "r") as f:
+        dat = f.read()
+
+    try:
+        # maybe it's a JSON file?
+        dat = json.loads(dat)
+        zf = zone_file.make_zone_file( dat, origin=origin, ttl=ttl )
+        print zf
+
+    except ValueError:
+        # maybe it's a zone file?
+        zfj = zone_file.parse_zone_file( dat )
+        print json.dumps(zfj, indent=4, sort_keys=True)
+
+    except Exception, e:
+        traceback.print_exc()
+        sys.exit(1)
+
