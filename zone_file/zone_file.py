@@ -102,10 +102,11 @@ def processSOA( data, template ):
     """
     ret = template[:]
 
-    assert len(data) == 1, "Only support one SOA RR at this time"
-    data = data[0]
-
     if data is not None:
+    
+        assert len(data) == 1, "Only support one SOA RR at this time"
+        data = data[0]
+
         soadat = []
         domain_fields = ['mname', 'rname']
         param_fields = ['serial', 'refresh', 'retry', 'expire', 'minimum']
