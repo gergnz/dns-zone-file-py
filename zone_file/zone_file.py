@@ -117,10 +117,13 @@ def processSOA( data, template ):
   
         soadat.append("IN")
         soadat.append("SOA")
+        soadat.append("(")
 
         for key in fields:
             value = str(data[key])
             soadat.append( value )
+
+        soadat.append(")")
 
         soa_txt = " ".join(soadat)
         ret = ret.replace("{soa}", soa_txt)
@@ -417,7 +420,9 @@ def remove_comments( text ):
 
 def flatten( text ):
     """
-    Flatten the text: make sure each record is on one line.
+    Flatten the text:
+    * make sure each record is on one line.
+    * remove parenthesis 
     """
     lines = text.split("\n")
 
@@ -544,8 +549,6 @@ def parse_line( parser, RRtok, parsed_records ):
     elif len(RRtok) >= 3 and RRtok[2] in SUPPORTED_RECORDS:
         # with ttl
         RRtok = [RRtok[2]] + RRtok
-
-    print RRtok
 
     rr, unmatched = parser.parse_known_args( RRtok )
     assert len(unmatched) == 0, "Unmatched fields: %s" % unmatched
