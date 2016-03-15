@@ -69,8 +69,8 @@ def generate( options, template=None ):
     template = processSPF( options.get('SPF', None), template )
     template = processURI( options.get('URI', None), template )
 
-    # remove newlines 
-    template = "\n".join( filter( lambda l: len(l.strip()) > 0, [tl.strip() for tl in template.split("\n")]) )
+    # remove newlines, but terminate with one
+    template = "\n".join( filter( lambda l: len(l.strip()) > 0, [tl.strip().upper() for tl in template.split("\n")]) ) + "\n"
     return template
 
 
