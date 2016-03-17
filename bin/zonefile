@@ -32,8 +32,18 @@ if __name__ == "__main__":
 
     except ValueError:
         # maybe it's a zone file?
-        zfj = zone_file.parse_zone_file( dat )
-        print json.dumps(zfj, indent=4, sort_keys=True)
+        try:
+            zfj = zone_file.parse_zone_file( dat )
+            print json.dumps(zfj, indent=4, sort_keys=True)
+        except zone_file.InvalidLineException, e:
+            print >> sys.stderr, "WARN: Invalid line: %s" % str(e)
+            print >> sys.stderr, "Trying again, while ignoring invalid lines"
+            try:
+                zfj = zone_file.parse_zone_file( dat, ignore_invalid=True )
+                print json.dumps(zfj, indent=4, sort_keys=True)
+            except:
+                traceback.print_exc()
+                sys.exit(1)
 
     except Exception, e:
         traceback.print_exc()
