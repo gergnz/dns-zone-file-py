@@ -1,5 +1,8 @@
 zone_files = {
-    "sample_1": """@ 10800 IN A 217.70.184.38
+    "sample_1": """
+$ORIGIN example.com
+$TTL 86400
+@ 10800 IN A 217.70.184.38
 blog 10800 IN CNAME blogs.vip.gandi.net.
 imap 10800 IN CNAME access.mail.gandi.net.
 pop 10800 IN CNAME access.mail.gandi.net.
