@@ -1,5 +1,5 @@
 zone_files = {
-    "SAMPLE_1": """@ 10800 IN A 217.70.184.38
+    "sample_1": """@ 10800 IN A 217.70.184.38
 blog 10800 IN CNAME blogs.vip.gandi.net.
 imap 10800 IN CNAME access.mail.gandi.net.
 pop 10800 IN CNAME access.mail.gandi.net.
@@ -8,7 +8,7 @@ webmail 10800 IN CNAME webmail.gandi.net.
 www 10800 IN CNAME webredir.vip.gandi.net.
 @ 10800 IN MX 50 fb.mail.gandi.net.
 @ 10800 IN MX 10 spool.mail.gandi.net.""",
-    "SAMPLE_2": """
+    "sample_2": """
 $ORIGIN example.com
 $TTL 86400
 
@@ -21,7 +21,7 @@ ftp          IN     CNAME   server1
 mail         IN     CNAME   server1
 mail2        IN     CNAME   server2
 www          IN     CNAME   server2""",
-    "SAMPLE_3": """$ORIGIN example.com
+    "sample_3": """$ORIGIN example.com
 $TTL 86400
 @     IN     SOA    dns1.example.com.     hostmaster.example.com. (
                     2001062501 ; serial
@@ -47,4 +47,94 @@ ftp          IN     CNAME   server1
 mail         IN     CNAME   server1
 mail2        IN     CNAME   server2
 www          IN     CNAME   server2"""
+}
+
+zone_file_objects = {
+  "sample_1": {
+    "$origin": "naval.id",
+    "$ttl": "3600",
+    "uri": [{
+      "name": "@",
+      "ttl": "1D",
+      "priority": 1,
+      "weight": 10,
+      "target": "https://mq9.s3.amazonaws.com/naval.id/profile.json"
+    }]
+  },
+  "sample_2": {
+    "$origin": "MYDOMAIN.COM.",
+    "$ttl": 3600,
+    "soa": {
+        "mname": "NS1.NAMESERVER.NET.",
+        "rname": "HOSTMASTER.MYDOMAIN.COM.",
+        "serial": "{time}",
+        "refresh": 3600,
+        "retry": 600,
+        "expire": 604800,
+        "minimum": 86400
+    },
+    "ns": [
+        { "host": "NS1.NAMESERVER.NET." },
+        { "host": "NS2.NAMESERVER.NET." }
+    ],
+    "a": [
+        { "name": "@", "ip": "127.0.0.1" },
+        { "name": "www", "ip": "127.0.0.1" },
+        { "name": "mail", "ip": "127.0.0.1" }
+    ],
+    "aaaa": [
+        { "ip": "::1" },
+        { "name": "mail", "ip": "2001:db8::1" }
+    ],
+    "cname": [
+        { "name": "mail1", "alias": "mail" },
+        { "name": "mail2", "alias": "mail" }
+    ],
+    "mx": [
+        { "preference": 0, "host": "mail1" },
+        { "preference": 10, "host": "mail2" }
+    ],
+    "txt": [
+        { "name": "txt1", "txt": "hello" },
+        { "name": "txt2", "txt": "world" }
+    ],
+    "srv": [
+        { "name": "_xmpp-client._tcp", "target": "jabber", "priority": 10, "weight": 0, "port": 5222 },
+        { "name": "_xmpp-server._tcp", "target": "jabber", "priority": 10, "weight": 0, "port": 5269 }
+    ]
+  },
+  "sample_3": {
+    "$origin": "MYDOMAIN.COM.",
+    "$ttl": 3600,
+    "soa": {
+        "mname": "NS1.NAMESERVER.NET.",
+        "rname": "HOSTMASTER.MYDOMAIN.COM.",
+        "serial": "{time}",
+        "refresh": 3600,
+        "retry": 600,
+        "expire": 604800,
+        "minimum": 86400
+    },
+    "ns": [
+        { "host": "NS1.NAMESERVER.NET." },
+        { "host": "NS2.NAMESERVER.NET." }
+    ],
+    "a": [
+        { "name": "@", "ip": "127.0.0.1" },
+        { "name": "www", "ip": "127.0.0.1" },
+        { "name": "mail", "ip": "127.0.0.1" }
+    ],
+    "aaaa": [
+        { "ip": "::1" },
+        { "name": "mail", "ip": "2001:db8::1" }
+    ],
+    "cname":[
+        { "name": "mail1", "alias": "mail" },
+        { "name": "mail2", "alias": "mail" }
+    ],
+    "mx":[
+        { "preference": 0, "host": "mail1" },
+        { "preference": 10, "host": "mail2" }
+    ]
+  }
 }
