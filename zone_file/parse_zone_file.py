@@ -330,7 +330,7 @@ def parse_line(parser, record_token, parsed_records):
     if len(record_dict) > 0:
         if record_type.startswith("$"):
             # put the value directly
-            record_dict_key = record_type.lower().replace('$', '')
+            record_dict_key = record_type.lower()
             parsed_records[record_dict_key] = record_dict[record_type]
         else:
             record_dict_key = record_type.lower()

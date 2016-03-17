@@ -46,8 +46,8 @@ class ZoneFileTests(unittest.TestCase):
         self.assertTrue("a" in zone_file)
         self.assertTrue("cname" in zone_file)
         self.assertTrue("mx" in zone_file)
-        self.assertTrue("ttl" in zone_file)
-        self.assertTrue("origin" in zone_file)
+        self.assertTrue("$ttl" in zone_file)
+        self.assertTrue("$origin" in zone_file)
 
     def test_zone_file_parsing_2(self):
         zone_file = parse_zone_file(zone_files["sample_2"])
@@ -55,8 +55,8 @@ class ZoneFileTests(unittest.TestCase):
         self.assertTrue(isinstance(zone_file, dict))
         self.assertTrue("a" in zone_file)
         self.assertTrue("cname" in zone_file)
-        self.assertTrue("ttl" in zone_file)
-        self.assertTrue("origin" in zone_file)
+        self.assertTrue("$ttl" in zone_file)
+        self.assertTrue("$origin" in zone_file)
 
     def test_zone_file_parsing_3(self):
         zone_file = parse_zone_file(zone_files["sample_3"])
@@ -67,8 +67,8 @@ class ZoneFileTests(unittest.TestCase):
         self.assertTrue("ns" in zone_file)
         self.assertTrue("a" in zone_file)
         self.assertTrue("cname" in zone_file)
-        self.assertTrue("ttl" in zone_file)
-        self.assertTrue("origin" in zone_file)
+        self.assertTrue("$ttl" in zone_file)
+        self.assertTrue("$origin" in zone_file)
 
 def test_main():
     test_support.run_unittest(
