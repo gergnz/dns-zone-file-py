@@ -3,7 +3,7 @@ import traceback
 import unittest
 from test import test_support
 from zone_file import make_zone_file, parse_zone_file
-from test_sample_data import zone_files
+from test_sample_data import zone_files, zone_file_objects
 
 class ZoneFileTests(unittest.TestCase):
     def setUp(self):
@@ -12,34 +12,43 @@ class ZoneFileTests(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_zone_file_creation(self):
-        records = {
-           "URI": [
-              {
-                "name": "@",
-                "ttl": "1D",
-                "priority": 1,
-                "weight": 10,
-                "target": "https://mq9.s3.amazonaws.com/naval.id/profile.json"
-              }
-           ]
-        }
-        zone_file = make_zone_file( records, origin="ryan.id", ttl="3600" )
+    def test_zone_file_creation_1(self):
+        json_zone_file = zone_file_objects["sample_1"]
+        zone_file = make_zone_file(json_zone_file)
         print zone_file
         self.assertTrue(isinstance(zone_file, (unicode, str)))
+        self.assertTrue("$ORIGIN" in zone_file)
+        self.assertTrue("$TTL" in zone_file)
+        self.assertTrue("@ 1D URI" in zone_file)
 
-    def test_zone_file_parsing(self):
-        zone_file = parse_zone_file(zone_files["SAMPLE_1"])
+    def test_zone_file_creation_2(self):
+        json_zone_file = zone_file_objects["sample_2"]
+        zone_file = make_zone_file(json_zone_file)
+        print zone_file
+        self.assertTrue(isinstance(zone_file, (unicode, str)))
+        self.assertTrue("$ORIGIN" in zone_file)
+        self.assertTrue("$TTL" in zone_file)
+
+    def test_zone_file_creation_3(self):
+        json_zone_file = zone_file_objects["sample_3"]
+        zone_file = make_zone_file(json_zone_file)
+        print zone_file
+        self.assertTrue(isinstance(zone_file, (unicode, str)))
+        self.assertTrue("$ORIGIN" in zone_file)
+        self.assertTrue("$TTL" in zone_file)
+
+    def test_zone_file_parsing_1(self):
+        zone_file = parse_zone_file(zone_files["sample_1"])
         #print json.dumps(zone_file, indent=2)
         self.assertTrue(isinstance(zone_file, dict))
 
     def test_zone_file_parsing_2(self):
-        zone_file = parse_zone_file(zone_files["SAMPLE_2"])
+        zone_file = parse_zone_file(zone_files["sample_2"])
         #print json.dumps(zone_file, indent=2)
         self.assertTrue(isinstance(zone_file, dict))
 
     def test_zone_file_parsing_3(self):
-        zone_file = parse_zone_file(zone_files["SAMPLE_3"])
+        zone_file = parse_zone_file(zone_files["sample_3"])
         #print json.dumps(zone_file, indent=2)
         self.assertTrue(isinstance(zone_file, dict))
 
