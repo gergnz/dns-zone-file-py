@@ -43,6 +43,17 @@ defaultTemplate = """
 {uri}\n\
 """
 
+class InvalidLineException(Exception):
+    pass
+
+class ZonefileLineParser( argparse.ArgumentParser ):
+
+    def error(self, message):
+        """
+        Silent error message
+        """
+        raise InvalidLineException(message)
+
 
 def generate( options, template=None ):
     """
@@ -287,7 +298,7 @@ def make_parser():
     """
     Make an ArgumentParser that accepts DNS RRs
     """
-    p = argparse.ArgumentParser()
+    p = ZonefileLineParser()
     subp = p.add_subparsers()
 
     # parse $ORIGIN
@@ -522,7 +533,7 @@ def add_default_name( text ):
     return "\n".join(ret)
 
 
-def parse_zone_file( text ):
+def parse_zone_file( text, ignore_invalid=False ):
     """
     Parse a zonefile into a dict
     """
@@ -540,7 +551,7 @@ def parse_zone_file( text ):
     text = add_default_name( text )
     # print "======== default name"
     # print text
-    return parse_lines( text )
+    return parse_lines( text, ignore_invalid=ignore_invalid )
 
 
 def parse_line( parser, RRtok, parsed_records ):
@@ -548,10 +559,13 @@ def parse_line( parser, RRtok, parsed_records ):
     Given the parser, capitalized list of a line's tokens, and the current set of records 
     parsed so far, parse it into a dictionary.
 
-    Return the new set of parsed records
+    Return the new set of parsed records.
+    Raise an exception on error.
     """
 
     global SUPPORTED_RECORDS
+
+    line = " ".join(RRtok)
 
     # match parser to record type
     if len(RRtok) >= 2 and RRtok[1] in SUPPORTED_RECORDS:
@@ -562,8 +576,13 @@ def parse_line( parser, RRtok, parsed_records ):
         # with ttl
         RRtok = [RRtok[2]] + RRtok
 
-    rr, unmatched = parser.parse_known_args( RRtok )
-    assert len(unmatched) == 0, "Unmatched fields: %s" % unmatched
+    try:
+        rr, unmatched = parser.parse_known_args( RRtok )
+        assert len(unmatched) == 0, "Unmatched fields: %s" % unmatched
+
+    except (SystemExit, AssertionError, InvalidLineException):
+        # invalid argument 
+        raise InvalidLineException(line)
 
     rrd = rr.__dict__
 
@@ -601,7 +620,7 @@ def parse_line( parser, RRtok, parsed_records ):
     return parsed_records
 
 
-def parse_lines( text ):
+def parse_lines( text, ignore_invalid=False ):
     """
     Parse a zonefile into a dict.
     @text must be flattened--each record must be on one line.
@@ -613,7 +632,13 @@ def parse_lines( text ):
 
     for rrtxt in rrs:
         RRtok = tokenize( rrtxt )
-        ret = parse_line( parser, RRtok, ret )
+        try:
+            ret = parse_line( parser, RRtok, ret )
+        except InvalidLineException:
+            if ignore_invalid:
+                continue
+            else:
+                raise
 
     return ret
 
