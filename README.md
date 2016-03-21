@@ -31,9 +31,9 @@ www          IN     CNAME   server2
 >>> zone_file_object = parse_zone_file(zone_file)
 >>> print json.dumps(zone_file_object, indent=4, sort_keys=True)
 {
-    "$ORIGIN": "EXAMPLE.COM", 
-    "$TTL": 86400, 
-    "A": [
+    "$origin": "EXAMPLE.COM", 
+    "$ttl": 86400, 
+    "a": [
         {
             "ip": "10.0.1.5", 
             "name": "SERVER1"
@@ -51,7 +51,7 @@ www          IN     CNAME   server2
             "name": "DNS2"
         }
     ], 
-    "CNAME": [
+    "cname": [
         {
             "alias": "SERVER1", 
             "name": "FTP"
@@ -75,7 +75,7 @@ www          IN     CNAME   server2
 #### Making Zone Files
 
 ```python
->>> records = {'URI': [{'priority': 1, 'target': 'https://mq9.s3.amazonaws.com/naval.id/profile.json', 'name': '@', 'weight': 10, 'ttl': '1D'}]}
+>>> records = {'uri': [{'priority': 1, 'target': 'https://mq9.s3.amazonaws.com/naval.id/profile.json', 'name': '@', 'weight': 10, 'ttl': '1D'}]}
 >>> zone_file = make_zone_file(records, origin="ryan.id", ttl="3600")
 >>> print zone_file
 ```
