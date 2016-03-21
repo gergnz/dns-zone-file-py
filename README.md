@@ -78,6 +78,9 @@ www          IN     CNAME   server2
 >>> records = {'URI': [{'priority': 1, 'target': 'https://mq9.s3.amazonaws.com/naval.id/profile.json', 'name': '@', 'weight': 10, 'ttl': '1D'}]}
 >>> zone_file = make_zone_file(records, origin="ryan.id", ttl="3600")
 >>> print zone_file
+```
+
+```
 $ORIGIN ryan.id
 $TTL 3600
 @ 1D URI 1 10 "https://mq9.s3.amazonaws.com/naval.id/profile.json"
