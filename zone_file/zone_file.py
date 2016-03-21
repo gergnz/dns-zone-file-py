@@ -524,6 +524,9 @@ def add_default_name( text ):
     ret = []
     for line in lines:
         tokens = tokenize( line )
+        if len(tokens) == 0:
+            continue 
+
         if tokens[0] in SUPPORTED_RECORDS and not tokens[0].startswith("$"):
             # add back the name
             tokens = ['@'] + tokens 
