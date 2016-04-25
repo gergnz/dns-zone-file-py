@@ -4,9 +4,10 @@ from .record_processors import (
     process_srv, process_spf, process_uri
 )
 from .configs import DEFAULT_TEMPLATE
+import copy
 
 
-def make_zone_file(json_zone_file, template=None):
+def make_zone_file(json_zone_file_input, origin=None, ttl=None, template=None):
     """
     Generate the DNS zonefile, given a json-encoded description of the
     zone file (@json_zone_file) and the template to fill in (@template)
@@ -30,6 +31,14 @@ def make_zone_file(json_zone_file, template=None):
 
     if template is None:
         template = DEFAULT_TEMPLATE[:]
+
+    # careful...
+    json_zone_file = copy.deepcopy(json_zone_file_input)
+    if origin is not None:
+        json_zone_file['$origin'] = origin 
+
+    if ttl is not None:
+        json_zone_file['$ttl'] = ttl
 
     soa_records = [json_zone_file.get('soa')] if json_zone_file.get('soa') else None
 
