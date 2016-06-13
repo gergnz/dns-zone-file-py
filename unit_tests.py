@@ -2,7 +2,7 @@ import json
 import traceback
 import unittest
 from test import test_support
-from zone_file import make_zone_file, parse_zone_file
+from blockstack_zones import make_zone_file, parse_zone_file
 from test_sample_data import zone_files, zone_file_objects
 
 class ZoneFileTests(unittest.TestCase):
