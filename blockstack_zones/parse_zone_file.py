@@ -28,11 +28,11 @@ class ZonefileLineParser(argparse.ArgumentParser):
         raise InvalidLineException(message)
 
 
-def make_rr_subparser(subp, rec_type, args_and_types):
+def make_rr_subparser(subparsers, rec_type, args_and_types):
     """
     Make a subparser for a given type of DNS record
     """
-    sp = subp.add_parser(rec_type)
+    sp = subparsers.add_parser(rec_type)
 
     sp.add_argument("name", type=str)
     sp.add_argument("ttl", type=int, nargs='?')
@@ -48,15 +48,15 @@ def make_parser():
     """
     Make an ArgumentParser that accepts DNS RRs
     """
-    p = ZonefileLineParser()
-    subp = p.add_subparsers()
+    line_parser = ZonefileLineParser()
+    subparsers = line_parser.add_subparsers()
 
     # parse $ORIGIN
-    sp = subp.add_parser("$ORIGIN")
+    sp = subparsers.add_parser("$ORIGIN")
     sp.add_argument("$ORIGIN", type=str)
 
     # parse $TTL
-    sp = subp.add_parser("$TTL")
+    sp = subparsers.add_parser("$TTL")
     sp.add_argument("$TTL", type=int)
 
     # parse each RR
@@ -64,23 +64,23 @@ def make_parser():
         ("mname", str), ("rname", str), ("serial", int), ("refresh", int),
         ("retry", int), ("expire", int), ("minimum", int)
     ]
-    make_rr_subparser(subp, "SOA", args_and_types)
+    make_rr_subparser(subparsers, "SOA", args_and_types)
 
-    make_rr_subparser(subp, "NS", [("host", str)])
-    make_rr_subparser(subp, "A", [("ip", str)])
-    make_rr_subparser(subp, "AAAA", [("ip", str)])
-    make_rr_subparser(subp, "CNAME", [("alias", str)])
-    make_rr_subparser(subp, "MX", [("preference", str), ("host", str)])
-    make_rr_subparser(subp, "TXT", [("txt", str)])
-    make_rr_subparser(subp, "PTR", [("host", str)])
-    make_rr_subparser(subp, "SRV", [("priority", int), ("weight", int), ("port", int), ("target", str)])
-    make_rr_subparser(subp, "SPF", [("data", str)])
-    make_rr_subparser(subp, "URI", [("priority", int), ("weight", int), ("target", str)])
+    make_rr_subparser(subparsers, "NS", [("host", str)])
+    make_rr_subparser(subparsers, "A", [("ip", str)])
+    make_rr_subparser(subparsers, "AAAA", [("ip", str)])
+    make_rr_subparser(subparsers, "CNAME", [("alias", str)])
+    make_rr_subparser(subparsers, "MX", [("preference", str), ("host", str)])
+    make_rr_subparser(subparsers, "TXT", [("txt", str)])
+    make_rr_subparser(subparsers, "PTR", [("host", str)])
+    make_rr_subparser(subparsers, "SRV", [("priority", int), ("weight", int), ("port", int), ("target", str)])
+    make_rr_subparser(subparsers, "SPF", [("data", str)])
+    make_rr_subparser(subparsers, "URI", [("priority", int), ("weight", int), ("target", str)])
 
-    return p
+    return line_parser
 
 
-def tokenize(line):
+def tokenize_line(line):
     """
     Tokenize a line:
     * split tokens on whitespace
@@ -102,16 +102,13 @@ def tokenize(line):
                     ret.append(tokbuf)
 
                 tokbuf = ""
-
             elif quote:
                 # in quotes
                 tokbuf += c
-
             elif escape:
                 # escaped space
                 tokbuf += c
                 escape = False
-
             else:
                 tokbuf = ""
 
@@ -120,7 +117,6 @@ def tokenize(line):
         if c == '\\':
             escape = True
             continue
-
         elif c == '"':
             if not escape:
                 if quote:
@@ -129,12 +125,10 @@ def tokenize(line):
                     tokbuf = ""
                     quote = False
                     continue
-
                 else:
                     # beginning of quote
                     quote = True
                     continue
-
         elif c == ';':
             if not escape:
                 # comment 
@@ -181,7 +175,7 @@ def remove_comments(text):
         if len(line) == 0:
             continue 
 
-        line = serialize(tokenize(line))
+        line = serialize(tokenize_line(line))
         ret.append(line)
 
     return "\n".join(ret)
@@ -244,7 +238,7 @@ def remove_class(text):
     lines = text.split("\n")
     ret = []
     for line in lines:
-        tokens = tokenize(line)
+        tokens = tokenize_line(line)
         tokens_upper = [t.upper() for t in tokens]
 
         if "IN" in tokens_upper:
@@ -271,7 +265,7 @@ def add_default_name(text):
     lines = text.split("\n")
     ret = []
     for line in lines:
-        tokens = tokenize(line)
+        tokens = tokenize_line(line)
         if len(tokens) == 0:
             continue
 
@@ -284,7 +278,7 @@ def add_default_name(text):
     return "\n".join(ret)
 
 
-def parse_line(parser, RRtok, parsed_records):
+def parse_line(parser, record_token, parsed_records):
     """
     Given the parser, capitalized list of a line's tokens, and the current set of records 
     parsed so far, parse it into a dictionary.
@@ -295,57 +289,55 @@ def parse_line(parser, RRtok, parsed_records):
 
     global SUPPORTED_RECORDS
 
-    line = " ".join(RRtok)
+    line = " ".join(record_token)
 
     # match parser to record type
-    if len(RRtok) >= 2 and RRtok[1] in SUPPORTED_RECORDS:
+    if len(record_token) >= 2 and record_token[1] in SUPPORTED_RECORDS:
         # with no ttl
-        RRtok = [RRtok[1]] + RRtok
-
-    elif len(RRtok) >= 3 and RRtok[2] in SUPPORTED_RECORDS:
+        record_token = [record_token[1]] + record_token
+    elif len(record_token) >= 3 and record_token[2] in SUPPORTED_RECORDS:
         # with ttl
-        RRtok = [RRtok[2]] + RRtok
+        record_token = [record_token[2]] + record_token
 
     try:
-        rr, unmatched = parser.parse_known_args(RRtok)
+        rr, unmatched = parser.parse_known_args(record_token)
         assert len(unmatched) == 0, "Unmatched fields: %s" % unmatched
-
     except (SystemExit, AssertionError, InvalidLineException):
         # invalid argument 
         raise InvalidLineException(line)
 
-    rrd = rr.__dict__
+    record_dict = rr.__dict__
 
     # what kind of record? including origin and ttl
-    rectype = None
-    for key in rrd.keys():
-        if key in SUPPORTED_RECORDS and (key.startswith("$") or rrd[key] == key):
-            rectype = key
-            if rrd[key] == key:
-                del rrd[key]
+    record_type = None
+    for key in record_dict.keys():
+        if key in SUPPORTED_RECORDS and (key.startswith("$") or record_dict[key] == key):
+            record_type = key
+            if record_dict[key] == key:
+                del record_dict[key]
             break
 
-    assert rectype is not None, "Unknown record type in %s" % rr
+    assert record_type is not None, "Unknown record type in %s" % rr
 
     # clean fields
-    for field in rrd.keys():
-        if rrd[field] is None:
-            del rrd[field]
+    for field in record_dict.keys():
+        if record_dict[field] is None:
+            del record_dict[field]
 
-    current_origin = rrd.get('$ORIGIN', parsed_records.get('$ORIGIN', None))
+    current_origin = record_dict.get('$ORIGIN', parsed_records.get('$ORIGIN', None))
 
     # special record-specific fix-ups
-    if rectype == 'PTR':
-        rrd['fullname'] = rrd['name'] + '.' + current_origin
+    if record_type == 'PTR':
+        record_dict['fullname'] = record_dict['name'] + '.' + current_origin
       
-    if len(rrd) > 0:
-        if rectype.startswith("$"):
+    if len(record_dict) > 0:
+        if record_type.startswith("$"):
             # put the value directly
-            parsed_records[rectype] = rrd[rectype]
-
+            record_dict_key = record_type.lower()
+            parsed_records[record_dict_key] = record_dict[record_type]
         else:
-            parsed_records[rectype].append(rrd)
-
+            record_dict_key = record_type.lower()
+            parsed_records[record_dict_key].append(record_dict)
 
     return parsed_records
 
@@ -356,21 +348,21 @@ def parse_lines(text, ignore_invalid=False):
     @text must be flattened--each record must be on one line.
     Also, all comments must be removed.
     """
-    ret = defaultdict(list)
-    rrs = text.split("\n")
+    json_zone_file = defaultdict(list)
+    record_lines = text.split("\n")
     parser = make_parser()
 
-    for rrtxt in rrs:
-        RRtok = tokenize(rrtxt)
+    for record_line in record_lines:
+        record_token = tokenize_line(record_line)
         try:
-            ret = parse_line(parser, RRtok, ret)
+            json_zone_file = parse_line(parser, record_token, json_zone_file)
         except InvalidLineException:
             if ignore_invalid:
                 continue
             else:
                 raise
 
-    return ret
+    return json_zone_file
 
 
 def parse_zone_file(text, ignore_invalid=False):
@@ -381,4 +373,5 @@ def parse_zone_file(text, ignore_invalid=False):
     text = flatten(text)
     text = remove_class(text)
     text = add_default_name(text)
-    return parse_lines(text, ignore_invalid=ignore_invalid)
+    json_zone_file = parse_lines(text, ignore_invalid=ignore_invalid)
+    return json_zone_file

@@ -5,29 +5,29 @@ def process_origin(data, template):
     """
     Replace {$origin} in template with a serialized $ORIGIN record
     """
-    ret = ""
+    record = ""
     if data is not None:
-        ret += "$ORIGIN %s" % data
+        record += "$ORIGIN %s" % data
 
-    return template.replace("{$origin}", ret)
+    return template.replace("{$origin}", record)
 
 
 def process_ttl(data, template):
     """
     Replace {$ttl} in template with a serialized $TTL record
     """
-    ret = ""
+    record = ""
     if data is not None:
-        ret += "$TTL %s" % data
+        record += "$TTL %s" % data
 
-    return template.replace("{$ttl}", ret)
+    return template.replace("{$ttl}", record)
 
 
 def process_soa(data, template):
     """
     Replace {SOA} in template with a set of serialized SOA records
     """
-    ret = template[:]
+    record = template[:]
 
     if data is not None:
     
@@ -52,24 +52,24 @@ def process_soa(data, template):
 
         for key in domain_fields:
             value = str(data[key])
-            soadat.append( value )
+            soadat.append(value)
 
         soadat.append("(")
 
         for key in param_fields:
             value = str(data[key])
-            soadat.append( value )
+            soadat.append(value)
 
         soadat.append(")")
 
         soa_txt = " ".join(soadat)
-        ret = ret.replace("{soa}", soa_txt)
+        record = record.replace("{soa}", soa_txt)
 
     else:
         # clear all SOA fields 
-        ret = ret.replace("{soa}", "")
+        record = record.replace("{soa}", "")
 
-    return ret
+    return record
 
 
 def quote_field(data, field):
@@ -88,36 +88,40 @@ def quote_field(data, field):
     return data_dup
 
 
-def process_rr(data, rectype, reckey, field, template):
+def process_rr(data, record_type, record_keys, field, template):
     """
     Meta method:
-    Replace $field in template with the serialized $rectype records,
-    using @reckey from each datum.
+    Replace $field in template with the serialized $record_type records,
+    using @record_key from each datum.
     """
     if data is None:
         return template.replace(field, "")
 
-    if type(reckey) != list:
-        reckey = [reckey]
+    if type(record_keys) == list:
+        pass
+    elif type(record_keys) == str:
+        record_keys = [record_keys]
+    else:
+        raise ValueError("Invalid record keys")
 
     assert type(data) == list, "Data must be a list"
 
-    ret = ""
+    record = ""
     for i in xrange(0, len(data)):
 
-        for rk in reckey:
-            assert rk in data[i].keys(), "Missing '%s'" % rk
+        for record_key in record_keys:
+            assert record_key in data[i].keys(), "Missing '%s'" % record_key
 
-        retdat = []
-        retdat.append( str(data[i].get('name', '@')) )
+        record_data = []
+        record_data.append( str(data[i].get('name', '@')) )
         if data[i].get('ttl') is not None:
-            retdat.append( str(data[i]['ttl']) )
+            record_data.append( str(data[i]['ttl']) )
 
-        retdat.append(rectype)
-        retdat += [str(data[i][rk]) for rk in reckey]
-        ret += " ".join(retdat) + "\n"
+        record_data.append(record_type)
+        record_data += [str(data[i][record_key]) for record_key in record_keys]
+        record += " ".join(record_data) + "\n"
 
-    return template.replace(field, ret)
+    return template.replace(field, record)
 
 
 def process_ns(data, template):
