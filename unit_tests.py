@@ -29,6 +29,7 @@ class ZoneFileTests(unittest.TestCase):
         self.assertTrue("$ORIGIN" in zone_file)
         self.assertTrue("$TTL" in zone_file)
         self.assertTrue("@ IN SOA" in zone_file)
+        self.assertTrue("www IN A 127.0.0.1" in zone_file)
 
     def test_zone_file_creation_3(self):
         json_zone_file = zone_file_objects["sample_3"]
