@@ -117,6 +117,7 @@ def process_rr(data, record_type, record_keys, field, template):
         if data[i].get('ttl') is not None:
             record_data.append( str(data[i]['ttl']) )
 
+        record_data.append("IN")
         record_data.append(record_type)
         record_data += [str(data[i][record_key]) for record_key in record_keys]
         record += " ".join(record_data) + "\n"
