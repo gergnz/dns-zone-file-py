@@ -36,6 +36,7 @@ def make_rr_subparser(subparsers, rec_type, args_and_types):
 
     sp.add_argument("name", type=str)
     sp.add_argument("ttl", type=int, nargs='?')
+    sp.add_argument("class", type=str)
     sp.add_argument(rec_type, type=str)
 
     for (argname, argtype) in args_and_types:
@@ -262,14 +263,32 @@ def parse_line(parser, record_token, parsed_records):
     global SUPPORTED_RECORDS
 
     line = " ".join(record_token)
+    class_inferred = False
 
-    # match parser to record type
+    # match parser to record type, add record type as first element
     if len(record_token) >= 2 and record_token[1] in SUPPORTED_RECORDS:
-        # with no ttl
+        # RR has no TTL or CLASS
         record_token = [record_token[1]] + record_token
+        record_token.insert(2, "IN")
+        class_inferred = True
+
     elif len(record_token) >= 3 and record_token[2] in SUPPORTED_RECORDS:
-        # with ttl
+        # RR has a TTL or CLASS
         record_token = [record_token[2]] + record_token
+        if record_token[2][0].isdigit():
+            # First character of token is numeric, must be TTL value and not a CLASS.
+            # Add default IN class
+            record_token.insert(3, "IN")
+            class_inferred = True
+
+    elif len(record_token) >= 4 and record_token[3] in SUPPORTED_RECORDS:
+        # RR has a TTL and CLASS
+        record_token = [record_token[3]] + record_token
+
+        # Class and TTL can be provided in either order, always place TTL before CLASS
+        if not record_token[2][0].isdigit():
+            record_token[2], record_token[3] = record_token[3], record_token[2]
+
 
     try:
         rr, unmatched = parser.parse_known_args(record_token)
@@ -301,7 +320,11 @@ def parse_line(parser, record_token, parsed_records):
     # special record-specific fix-ups
     if record_type == 'PTR':
         record_dict['fullname'] = record_dict['name'] + '.' + current_origin
-      
+
+    # Add a hint that no CLASS was provide for this record, defaulted to IN
+    if class_inferred:
+        record_dict['_missing_class'] = True
+
     if len(record_dict) > 0:
         if record_type.startswith("$"):
             # put the value directly
