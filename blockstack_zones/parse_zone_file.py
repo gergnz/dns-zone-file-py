@@ -227,34 +227,6 @@ def flatten(text):
     return "\n".join(flattened)
 
 
-def remove_class(text):
-    """
-    Remove the CLASS from each DNS record, if present.
-    The only class that gets used today (for all intents
-    and purposes) is 'IN'.
-    """
-
-    # see RFC 1035 for list of classes
-    lines = text.split("\n")
-    ret = []
-    for line in lines:
-        tokens = tokenize_line(line)
-        tokens_upper = [t.upper() for t in tokens]
-
-        if "IN" in tokens_upper:
-            tokens.remove("IN")
-        elif "CS" in tokens_upper:
-            tokens.remove("CS")
-        elif "CH" in tokens_upper:
-            tokens.remove("CH")
-        elif "HS" in tokens_upper:
-            tokens.remove("HS")
-
-        ret.append(serialize(tokens))
-
-    return "\n".join(ret)
-
-
 def add_default_name(text):
     """
     Go through each line of the text and ensure that 
@@ -371,7 +343,6 @@ def parse_zone_file(text, ignore_invalid=False):
     """
     text = remove_comments(text)
     text = flatten(text)
-    text = remove_class(text)
     text = add_default_name(text)
     json_zone_file = parse_lines(text, ignore_invalid=ignore_invalid)
     return json_zone_file
