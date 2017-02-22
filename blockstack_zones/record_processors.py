@@ -32,7 +32,7 @@ def process_soa(data, template):
     if data is not None:
     
         assert len(data) == 1, "Only support one SOA RR at this time"
-        data = data[0]
+        data = data[0][0]
 
         soadat = []
         domain_fields = ['mname', 'rname']
